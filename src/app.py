@@ -648,7 +648,7 @@ afficher_bandeau()
 
 
 # =============================================================================
-# FILTRES (sidebar) — Version professionnelle
+# FILTRES (sidebar) — Version corrigée
 # =============================================================================
 
 mois_disponibles = (
@@ -710,13 +710,14 @@ with st.sidebar:
         """,
         unsafe_allow_html=True,
     )
+    # On utilise value avec la session state, pas de key
     periode_selectionnee = st.select_slider(
         "Période (par mois)",
         options=labels_mois,
         value=st.session_state.periode_filtre,
-        key="periode_filtre_widget",
         label_visibility="collapsed",
     )
+    # On met à jour la session state avec la valeur choisie par l'utilisateur
     st.session_state.periode_filtre = periode_selectionnee
 
     # Plateforme
@@ -732,30 +733,27 @@ with st.sidebar:
         "Plateforme(s)",
         options=plateformes_disponibles,
         default=st.session_state.plateformes_filtre,
-        key="plateformes_filtre_widget",
         label_visibility="collapsed",
     )
+    # On met à jour la session state
     st.session_state.plateformes_filtre = plateformes_choisies
 
     if not plateformes_choisies:
         st.warning("Sélectionne au moins une plateforme.")
         st.stop()
 
-    # Boutons : réinitialisation et export (sera mis à jour après filtrage)
-    col_reset, col_export = st.columns(2)
-    with col_reset:
-        if st.button("↻ Réinitialiser", width="stretch"):
-            st.session_state.periode_filtre = (labels_mois[0], labels_mois[-1])
-            st.session_state.plateformes_filtre = plateformes_disponibles.copy()
-            st.rerun()
-    # L'export CSV sera placé après le calcul de df_filtre
+    # Bouton Réinitialiser
+    if st.button("↻ Réinitialiser", width="stretch"):
+        st.session_state.periode_filtre = (labels_mois[0], labels_mois[-1])
+        st.session_state.plateformes_filtre = plateformes_disponibles.copy()
+        st.rerun()
 
     st.markdown(
         "<hr style='border: none; border-top: 1px solid rgba(255,255,255,0.08); margin: 16px 0;'>",
         unsafe_allow_html=True,
     )
 
-    # Résumé (sera mis à jour)
+    # Résumé (sera mis à jour après filtrage)
     placeholder_resume = st.empty()
 
     st.caption(
@@ -763,7 +761,7 @@ with st.sidebar:
     )
 
 # ---- Calcul du df_filtre ----
-mois_debut_label, mois_fin_label = periode_selectionnee
+mois_debut_label, mois_fin_label = st.session_state.periode_filtre
 mois_debut, mois_fin = periode_vers_dates(
     df, mois_debut_label, mois_fin_label, labels_mois, mois_disponibles
 )
@@ -771,12 +769,11 @@ mois_debut, mois_fin = periode_vers_dates(
 df_filtre = df[
     (df["date"] >= mois_debut)
     & (df["date"] <= mois_fin)
-    & (df["plateforme"].isin(plateformes_choisies))
+    & (df["plateforme"].isin(st.session_state.plateformes_filtre))
 ].copy()
 
 # Mise à jour du résumé et du bouton d'export dans le sidebar
 with st.sidebar:
-    # Résumé
     with placeholder_resume.container():
         nb_signaux = len(df_filtre)
         st.markdown(
@@ -851,7 +848,7 @@ with col3:
 with col4:
     carte_kpi(
         "Plateformes sélectionnées",
-        len(plateformes_choisies),
+        len(st.session_state.plateformes_filtre),
         "plateforme(s) active(s)",
         icone="📱",
         accent=INDIGO,
@@ -1211,8 +1208,8 @@ with onglet5:
     a_debut, a_fin = periode_vers_dates(df, periode_a[0], periode_a[1], labels_mois, mois_disponibles)
     b_debut, b_fin = periode_vers_dates(df, periode_b[0], periode_b[1], labels_mois, mois_disponibles)
 
-    df_a = df[(df["date"] >= a_debut) & (df["date"] <= a_fin) & (df["plateforme"].isin(plateformes_choisies))].copy()
-    df_b = df[(df["date"] >= b_debut) & (df["date"] <= b_fin) & (df["plateforme"].isin(plateformes_choisies))].copy()
+    df_a = df[(df["date"] >= a_debut) & (df["date"] <= a_fin) & (df["plateforme"].isin(st.session_state.plateformes_filtre))].copy()
+    df_b = df[(df["date"] >= b_debut) & (df["date"] <= b_fin) & (df["plateforme"].isin(st.session_state.plateformes_filtre))].copy()
 
     nb_a = len(df_a)
     nb_b = len(df_b)
