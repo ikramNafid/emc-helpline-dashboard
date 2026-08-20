@@ -2,7 +2,7 @@
 CMRPI - EMC Helpline | Projet N°10
 Tableau de bord décisionnel et analytique des signalements
 
-Version Finale - Design amélioré, responsive, interactif
+Version Finale - Design Executive Premium, responsive, compatible Streamlit
 - filtres période + plateforme
 - réinitialisation des filtres
 - comparaison entre deux périodes
@@ -15,7 +15,7 @@ Version Finale - Design amélioré, responsive, interactif
 - export CSV des données filtrées
 - page Documentation
 
-Améliorations : design moderne, mise en page fluide, interactivité, responsive.
+Améliorations : design Executive Premium, sidebar élégante, cartes « À retenir » individuelles, hiérarchie visuelle renforcée, responsive, rendu HTML compatible avec les versions Streamlit ne supportant pas st.html.
 """
 
 import streamlit as st
@@ -89,7 +89,7 @@ POLICE_TEXTE = "Inter"
 # =============================================================================
 
 def injecter_css():
-    st.html(
+    st.markdown(
         f"""
         <style>
 
@@ -115,53 +115,292 @@ def injecter_css():
 
 
         /* =========================================================
-           SIDEBAR
+           SIDEBAR — DESIGN PREMIUM
         ========================================================= */
 
         section[data-testid="stSidebar"] {{
-            background: {NAVY};
-            padding: 2rem 1rem;
+            background:
+                radial-gradient(circle at 12% 6%, rgba(20,184,166,0.12), transparent 28%),
+                linear-gradient(180deg, #0b2238 0%, #0f2942 48%, #0a2136 100%);
+            border-right: 1px solid rgba(255,255,255,0.07);
+            box-shadow: 8px 0 30px rgba(9,27,46,0.10);
+            min-width: 300px;
+            max-width: 300px;
+        }}
+
+        section[data-testid="stSidebar"] > div {{
+            padding: 1.15rem 0.9rem 1rem;
         }}
 
         section[data-testid="stSidebar"] * {{
-            color: #e2e8f0;
+            font-family: '{POLICE_TEXTE}', sans-serif;
         }}
 
-        section[data-testid="stSidebar"] h1,
-        section[data-testid="stSidebar"] h2,
-        section[data-testid="stSidebar"] h3 {{
-            color: white !important;
+        /* --- identité --- */
+        .side-brand {{
+            position: relative;
+            padding: 14px;
+            margin-bottom: 16px;
+            border: 1px solid rgba(255,255,255,0.08);
+            border-radius: 16px;
+            background: linear-gradient(145deg, rgba(255,255,255,0.075), rgba(255,255,255,0.025));
+            box-shadow: inset 0 1px 0 rgba(255,255,255,0.05);
+            overflow: hidden;
+        }}
+
+        .side-brand::after {{
+            content: "";
+            position: absolute;
+            width: 105px;
+            height: 105px;
+            right: -48px;
+            top: -50px;
+            border-radius: 50%;
+            background: rgba(20,184,166,0.10);
+        }}
+
+        .side-brand-row {{
+            display: flex;
+            align-items: center;
+            gap: 11px;
+            position: relative;
+            z-index: 1;
+        }}
+
+        .side-brand-icon {{
+            width: 42px;
+            height: 42px;
+            min-width: 42px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 12px;
+            background: linear-gradient(145deg, #14b8a6, #0d9488);
+            box-shadow: 0 7px 18px rgba(13,148,136,0.28);
+            font-size: 21px;
+        }}
+
+        .side-brand-title {{
+            color: #ffffff;
             font-family: '{POLICE_TITRE}', sans-serif;
-            font-weight: 700;
-            letter-spacing: 0.02em;
+            font-size: 17px;
+            font-weight: 800;
+            line-height: 1.15;
         }}
 
-        section[data-testid="stSidebar"] .stCaption {{
+        .side-brand-sub {{
+            color: #aebed0;
+            font-size: 10px;
+            margin-top: 4px;
+            line-height: 1.3;
+        }}
+
+        .side-project {{
+            display: inline-flex;
+            margin-top: 12px;
+            padding: 5px 8px;
+            border-radius: 7px;
+            background: rgba(255,255,255,0.055);
+            color: #c8d5e2;
+            font-size: 9px;
+            font-weight: 700;
+            letter-spacing: 0.04em;
+        }}
+
+        .side-divider {{
+            height: 1px;
+            background: linear-gradient(90deg, rgba(255,255,255,0.11), rgba(255,255,255,0.02));
+            margin: 14px 2px;
+        }}
+
+        /* --- sections --- */
+        .side-section-title {{
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            color: #d9e4ef;
+            font-size: 10px;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 0.10em;
+            margin: 15px 2px 7px;
+        }}
+
+        .side-section-icon {{
+            width: 23px;
+            height: 23px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 7px;
+            background: rgba(20,184,166,0.11);
+            border: 1px solid rgba(20,184,166,0.14);
+            font-size: 11px;
+        }}
+
+        /* --- période --- */
+        section[data-testid="stSidebar"] [data-testid="stSlider"] {{
+            padding: 3px 4px 2px;
+        }}
+
+        section[data-testid="stSidebar"] [data-testid="stSlider"] label {{
+            display: none;
+        }}
+
+        section[data-testid="stSidebar"] [data-baseweb="slider"] {{
+            margin: 0 2px;
+        }}
+
+        section[data-testid="stSidebar"] [data-testid="stTickBarMin"],
+        section[data-testid="stSidebar"] [data-testid="stTickBarMax"] {{
             color: #9fb0c2 !important;
+            font-size: 9px !important;
+        }}
+
+        /* --- plateformes --- */
+        section[data-testid="stSidebar"] [data-testid="stMultiSelect"] > div {{
+            background: rgba(255,255,255,0.055) !important;
+            border: 1px solid rgba(255,255,255,0.09) !important;
+            border-radius: 11px !important;
+            min-height: 46px;
+            box-shadow: inset 0 1px 0 rgba(255,255,255,0.035);
+        }}
+
+        section[data-testid="stSidebar"] [data-baseweb="select"] {{
+            background: transparent !important;
+        }}
+
+        section[data-testid="stSidebar"] [data-baseweb="tag"] {{
+            background: linear-gradient(135deg, #159f94, #0d9488) !important;
+            border: 1px solid rgba(255,255,255,0.10) !important;
+            border-radius: 6px !important;
+            color: white !important;
+            font-size: 10px !important;
+            font-weight: 600 !important;
+        }}
+
+        section[data-testid="stSidebar"] [data-baseweb="tag"] span {{
+            color: white !important;
+        }}
+
+        section[data-testid="stSidebar"] [data-baseweb="select"] input {{
+            color: #dbe7f2 !important;
+        }}
+
+        /* --- bouton --- */
+        section[data-testid="stSidebar"] .stButton {{
+            margin-top: 11px;
         }}
 
         section[data-testid="stSidebar"] .stButton button {{
-            background: {TEAL};
-            color: white;
-            font-weight: 600;
-            border: none;
-            border-radius: 8px;
-            transition: all 0.2s;
-            padding: 0.6rem 1rem;
+            width: 100%;
+            min-height: 38px;
+            background: linear-gradient(135deg, #14b8a6, #0d9488);
+            color: white !important;
+            font-size: 11px;
+            font-weight: 700;
+            border: 1px solid rgba(255,255,255,0.08);
+            border-radius: 10px;
+            box-shadow: 0 7px 16px rgba(13,148,136,0.18);
+            transition: transform .18s ease, box-shadow .18s ease;
         }}
+
         section[data-testid="stSidebar"] .stButton button:hover {{
-            background: {TEAL_DARK};
-            transform: scale(1.02);
+            transform: translateY(-1px);
+            box-shadow: 0 9px 20px rgba(13,148,136,0.25);
         }}
 
-        section[data-testid="stSidebar"] .stSelectSlider,
-        section[data-testid="stSidebar"] .stMultiSelect,
+        /* --- statut --- */
+        .side-status {{
+            margin-top: 4px;
+            padding: 11px 12px;
+            border: 1px solid rgba(255,255,255,0.075);
+            border-radius: 12px;
+            background: rgba(255,255,255,0.045);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }}
+
+        .side-status-icon {{
+            width: 31px;
+            height: 31px;
+            min-width: 31px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 9px;
+            background: rgba(20,184,166,0.12);
+            font-size: 15px;
+        }}
+
+        .side-status-label {{
+            color: #91a7bb;
+            font-size: 9px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: .07em;
+        }}
+
+        .side-status-value {{
+            color: white;
+            font-family: '{POLICE_TITRE}', sans-serif;
+            font-size: 19px;
+            font-weight: 800;
+            line-height: 1.1;
+            margin-top: 2px;
+        }}
+
+        .side-help {{
+            color: #8fa5b9;
+            font-size: 9px;
+            line-height: 1.45;
+            margin: 7px 2px 0;
+        }}
+
+        /* --- export --- */
         section[data-testid="stSidebar"] .stDownloadButton {{
-            background: rgba(255,255,255,0.05);
-            border-radius: 8px;
-            padding: 0.3rem 0.5rem;
+            margin-top: 10px;
         }}
 
+        section[data-testid="stSidebar"] .stDownloadButton button {{
+            width: 100%;
+            min-height: 36px;
+            background: rgba(255,255,255,0.055) !important;
+            color: #d4dfeb !important;
+            border: 1px solid rgba(255,255,255,0.09) !important;
+            border-radius: 10px !important;
+            font-size: 10px !important;
+            font-weight: 600 !important;
+            transition: all .18s ease;
+        }}
+
+        section[data-testid="stSidebar"] .stDownloadButton button:hover {{
+            background: rgba(255,255,255,0.09) !important;
+            border-color: rgba(20,184,166,0.35) !important;
+        }}
+
+        section[data-testid="stSidebar"] .stCaption {{
+            color: #8fa5b9 !important;
+            font-size: 9px !important;
+            line-height: 1.45;
+        }}
+
+        section[data-testid="stSidebar"] [data-testid="stAlert"] {{
+            background: rgba(245,158,11,0.09) !important;
+            border: 1px solid rgba(245,158,11,0.18) !important;
+            border-radius: 9px !important;
+        }}
+
+        .side-footer {{
+            margin-top: 15px;
+            padding-top: 10px;
+            border-top: 1px solid rgba(255,255,255,0.06);
+            text-align: center;
+            color: #6f879c;
+            font-size: 8px;
+            letter-spacing: .04em;
+        }}
 
         /* =========================================================
            TITRES GLOBAUX
@@ -298,87 +537,190 @@ def injecter_css():
 
 
         /* =========================================================
-           SECTION À RETENIR
+           SECTION « À RETENIR » — DESIGN PREMIUM / EXECUTIVE
         ========================================================= */
 
         .retient-header {{
             display: flex;
             align-items: center;
-            gap: 14px;
-            margin-top: 32px;
-            margin-bottom: 20px;
+            gap: 13px;
+            margin-top: 30px;
+            margin-bottom: 15px;
+            padding-left: 2px;
         }}
         .retient-icon {{
-            width: 48px;
-            height: 48px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            background: #fff7ed;
-            border: 1px solid #fed7aa;
-            border-radius: 14px;
-            font-size: 22px;
-        }}
-        .retient-title {{
-            color: {NAVY};
-            font-family: '{POLICE_TITRE}', sans-serif;
-            font-size: 22px;
-            font-weight: 800;
-        }}
-        .retient-subtitle {{
-            color: {TEXT_MUTED};
-            font-size: 14px;
-            margin-top: 2px;
-        }}
-
-        .insight-card {{
-            background: white;
-            border: none;
-            border-radius: 14px;
-            padding: 18px;
-            min-height: 150px;
-            box-shadow: {SHADOW};
-            transition: transform 0.2s ease, box-shadow 0.2s ease;
-            display: flex;
-            flex-direction: column;
-        }}
-        .insight-card:hover {{
-            transform: translateY(-3px);
-            box-shadow: 0 10px 28px rgba(15, 23, 42, 0.08);
-        }}
-        .insight-top {{
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            margin-bottom: 12px;
-        }}
-        .insight-icon {{
             width: 38px;
             height: 38px;
             display: flex;
             align-items: center;
             justify-content: center;
+            background: linear-gradient(145deg, #fffaf0, #fff6df);
+            border: 1px solid #f0dfbd;
             border-radius: 10px;
             font-size: 18px;
+            box-shadow: 0 3px 10px rgba(15, 23, 42, 0.04);
         }}
-        .insight-label {{
-            color: {TEXT_MUTED};
-            font-size: 11px;
-            text-transform: uppercase;
-            letter-spacing: 0.04em;
-            font-weight: 700;
-        }}
-        .insight-text {{
-            color: {TEXT};
-            font-size: 14px;
-            line-height: 1.5;
-            flex: 1;
-        }}
-        .insight-text strong {{
+        .retient-title {{
             color: {NAVY};
-            font-weight: 700;
+            font-family: '{POLICE_TITRE}', sans-serif;
+            font-size: 21px;
+            font-weight: 800;
+            line-height: 1.15;
+            letter-spacing: -0.01em;
+        }}
+        .retient-subtitle {{
+            color: {TEXT_MUTED};
+            font-size: 12px;
+            margin-top: 3px;
+            font-weight: 500;
         }}
 
+        /* Cartes « À retenir » — version Executive
+           Les 7 cartes restent indépendantes et conservent leur identité. */
+        .insight-panel {{
+            display: grid;
+            grid-template-columns: repeat(3, minmax(0, 1fr));
+            gap: 14px;
+            align-items: stretch;
+        }}
+
+        .insight-item {{
+            --accent: {NAVY};
+            position: relative;
+            min-height: 108px;
+            padding: 16px 17px 15px 18px;
+            background: linear-gradient(180deg, #ffffff 0%, #fbfcfe 100%);
+            border: 1px solid #e3e9ef;
+            border-radius: 11px;
+            box-shadow: 0 2px 8px rgba(15,23,42,.045);
+            overflow: hidden;
+            transition: transform .18s ease, box-shadow .18s ease, border-color .18s ease;
+        }}
+        .insight-item::before {{
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0;
+            height: 3px;
+            background: var(--accent);
+        }}
+        .insight-item::after {{
+            content: '';
+            position: absolute;
+            width: 80px; height: 80px;
+            right: -42px; bottom: -42px;
+            border-radius: 50%;
+            background: var(--accent);
+            opacity: .035;
+            pointer-events: none;
+        }}
+        .insight-item:hover {{
+            transform: translateY(-2px);
+            border-color: #d7e0e8;
+            box-shadow: 0 7px 20px rgba(15,23,42,.075);
+        }}
+
+        .insight-top {{
+            display: flex;
+            align-items: center;
+            gap: 9px;
+            margin-bottom: 10px;
+        }}
+        .insight-icon {{
+            width: 30px; height: 30px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 8px;
+            font-size: 14px;
+            flex: 0 0 30px;
+            border: 1px solid rgba(15,23,42,.035);
+        }}
+        .insight-label {{
+            color: #64748b;
+            font-size: 9px;
+            text-transform: uppercase;
+            letter-spacing: .075em;
+            font-weight: 800;
+            line-height: 1.25;
+        }}
+        .insight-text {{
+            color: #475569;
+            font-size: 12px;
+            line-height: 1.45;
+            padding-left: 1px;
+            max-width: 96%;
+        }}
+        .insight-text strong {{
+            display: inline-block;
+            color: {NAVY};
+            font-family: '{POLICE_TITRE}', sans-serif;
+            font-size: 15px;
+            font-weight: 800;
+            line-height: 1.2;
+            margin-right: 2px;
+        }}
+
+        /* Les cartes profil reprennent exactement le même langage visuel. */
+        .insight-profile {{
+            --accent: {NAVY_LIGHT};
+            position: relative;
+            min-height: 108px;
+            padding: 16px 17px 15px 18px;
+            background: linear-gradient(180deg, #ffffff 0%, #fbfcfe 100%);
+            border: 1px solid #e3e9ef;
+            border-radius: 11px;
+            box-shadow: 0 2px 8px rgba(15,23,42,.045);
+            overflow: hidden;
+        }}
+        .insight-profile::before {{
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0;
+            height: 3px;
+            background: linear-gradient(90deg, {NAVY_LIGHT}, {AMBER});
+        }}
+        .insight-profile .insight-top {{ margin-bottom: 10px; }}
+        .profil-synthese {{
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 7px;
+        }}
+        .profil-mini {{
+            background: #f8fafc;
+            border: 1px solid #e7edf3;
+            border-left: 3px solid var(--mini-accent);
+            border-radius: 7px;
+            padding: 6px 9px;
+        }}
+        .profil-mini-label {{
+            color: #7a8796;
+            font-size: 7.5px;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: .06em;
+            margin-bottom: 1px;
+        }}
+        .profil-mini-value {{
+            color: {NAVY};
+            font-size: 11px;
+            font-weight: 800;
+            line-height: 1.2;
+        }}
+        .profil-mini-detail {{
+            color: #64748b;
+            font-size: 8.5px;
+            margin-top: 1px;
+        }}
+
+        @media (max-width: 1150px) {{
+            .insight-panel {{ grid-template-columns: repeat(2, minmax(0, 1fr)); }}
+        }}
+        @media (max-width: 800px) {{
+            .insight-panel {{ grid-template-columns: repeat(2, minmax(0, 1fr)); }}
+        }}
+        @media (max-width: 560px) {{
+            .insight-panel {{ grid-template-columns: 1fr; gap: 10px; }}
+        }}
 
         /* =========================================================
            GRAPHIQUES - LÉGENDE
@@ -463,7 +805,8 @@ def injecter_css():
         }}
 
         </style>
-        """
+        """,
+        unsafe_allow_html=True,
     )
 
 
@@ -475,7 +818,14 @@ injecter_css()
 # =============================================================================
 
 def afficher_html(contenu):
-    st.html(contenu)
+    """
+    Rendu HTML robuste pour les versions récentes et anciennes de Streamlit.
+    st.html évite que certains blocs <div> soient affichés comme texte brut.
+    """
+    if hasattr(st, "html"):
+        st.html(contenu)
+    else:
+        st.markdown(contenu, unsafe_allow_html=True)
 
 
 def afficher_bandeau():
@@ -513,20 +863,21 @@ def carte_kpi(label, valeur, detail="", icone="📊", accent=TEAL):
     )
 
 
-def carte_insight(icone, label, texte, couleur):
-    afficher_html(
-        f"""
-        <div class="insight-card">
+def carte_insight_html(icone, label, texte, couleur, classe="insight-item"):
+    return f"""
+        <div class="{classe}" style="--accent: {couleur};">
             <div class="insight-top">
-                <div class="insight-icon" style="background: {couleur}18; color: {couleur};">
+                <div class="insight-icon" style="background: {couleur}14; color: {couleur};">
                     {icone}
                 </div>
                 <div class="insight-label">{label}</div>
             </div>
             <div class="insight-text">{texte}</div>
         </div>
-        """
-    )
+    """
+
+def carte_insight(icone, label, texte, couleur):
+    afficher_html(carte_insight_html(icone, label, texte, couleur))
 
 
 def legende(texte):
@@ -589,6 +940,51 @@ def format_variation(v):
         return "Non calculable"
     signe = "+" if v > 0 else ""
     return f"{signe}{v:.1f}%"
+
+
+def extraire_top_profil(tableau, colonnes_label):
+    """Retourne (libelle, pourcentage) pour la modalité la plus représentée."""
+    if tableau is None or tableau.empty:
+        return None
+
+    tableau = tableau.copy()
+
+    # Recherche souple du nom de la colonne contenant le libellé.
+    colonne_label = next(
+        (c for c in colonnes_label if c in tableau.columns),
+        tableau.columns[0],
+    )
+
+    # Recherche souple de la colonne de pourcentage.
+    colonne_pct = next(
+        (c for c in ["pourcentage", "Pourcentage", "pct", "percentage"] if c in tableau.columns),
+        None,
+    )
+
+    ligne = tableau.iloc[0]
+    libelle = str(ligne[colonne_label]).strip()
+
+    if colonne_pct is not None:
+        try:
+            pourcentage = float(ligne[colonne_pct])
+            return libelle, pourcentage
+        except (TypeError, ValueError):
+            pass
+
+    # Si le module KPI ne fournit pas de pourcentage, on le recalcule.
+    colonne_nombre = next(
+        (c for c in ["nombre", "count", "Nombre"] if c in tableau.columns),
+        None,
+    )
+    if colonne_nombre is not None:
+        try:
+            total = pd.to_numeric(tableau[colonne_nombre], errors="coerce").sum()
+            if total > 0:
+                return libelle, float(ligne[colonne_nombre]) / total * 100
+        except (TypeError, ValueError):
+            pass
+
+    return libelle, None
 
 
 # =============================================================================
@@ -681,83 +1077,77 @@ if "plateformes_filtre" not in st.session_state:
 
 # Sidebar
 with st.sidebar:
-    # En-tête
+    # Identité / marque
     st.markdown(
         """
-        <div style="text-align: center; margin-bottom: 12px;">
-            <div style="display: flex; justify-content: center; gap: 8px; align-items: center;">
-                <span style="font-size: 32px;">🛡️</span>
-                <span style="font-size: 22px; font-weight: 800; color: white; letter-spacing: 0.02em;">EMC Helpline</span>
+        <div class="side-brand">
+            <div class="side-brand-row">
+                <div class="side-brand-icon">🛡️</div>
+                <div>
+                    <div class="side-brand-title">EMC Helpline</div>
+                    <div class="side-brand-sub">Tableau de bord décisionnel</div>
+                </div>
             </div>
-            <div style="font-size: 13px; color: #b9c8d8; margin-top: 2px; font-weight: 500;">
-                Tableau de bord décisionnel
-            </div>
-            <div style="font-size: 12px; color: #8aa3bc; margin-top: 2px;">
-                Projet N°10 · CMRPI
-            </div>
-            <hr style="border: none; border-top: 1px solid rgba(255,255,255,0.1); margin: 14px 0;">
+            <div class="side-project">◈ PROJET N°10 · CMRPI</div>
         </div>
         """,
         unsafe_allow_html=True,
     )
 
-    # Période
+    # Filtres
     st.markdown(
         """
-        <div style="font-size: 13px; font-weight: 700; color: #b9c8d8; text-transform: uppercase; letter-spacing: 0.04em; margin-bottom: 6px;">
-            📅 Période
+        <div class="side-section-title">
+            <span class="side-section-icon">📅</span>
+            <span>Période d'analyse</span>
         </div>
         """,
         unsafe_allow_html=True,
     )
-    # On utilise value avec la session state, pas de key
+
     periode_selectionnee = st.select_slider(
         "Période (par mois)",
         options=labels_mois,
         value=st.session_state.periode_filtre,
         label_visibility="collapsed",
     )
-    # On met à jour la session state avec la valeur choisie par l'utilisateur
     st.session_state.periode_filtre = periode_selectionnee
 
-    # Plateforme
     st.markdown(
         """
-        <div style="font-size: 13px; font-weight: 700; color: #b9c8d8; text-transform: uppercase; letter-spacing: 0.04em; margin: 12px 0 6px;">
-            📱 Plateforme
+        <div class="side-section-title">
+            <span class="side-section-icon">◫</span>
+            <span>Plateformes</span>
         </div>
         """,
         unsafe_allow_html=True,
     )
+
     plateformes_choisies = st.multiselect(
         "Plateforme(s)",
         options=plateformes_disponibles,
         default=st.session_state.plateformes_filtre,
         label_visibility="collapsed",
     )
-    # On met à jour la session state
     st.session_state.plateformes_filtre = plateformes_choisies
 
     if not plateformes_choisies:
-        st.warning("Sélectionne au moins une plateforme.")
+        st.warning("Sélectionnez au moins une plateforme.")
         st.stop()
 
-    # Bouton Réinitialiser
-    if st.button("↻ Réinitialiser", width="stretch"):
+    # Actions
+    if st.button("↻  Réinitialiser les filtres", width="stretch"):
         st.session_state.periode_filtre = (labels_mois[0], labels_mois[-1])
         st.session_state.plateformes_filtre = plateformes_disponibles.copy()
         st.rerun()
 
-    st.markdown(
-        "<hr style='border: none; border-top: 1px solid rgba(255,255,255,0.08); margin: 16px 0;'>",
-        unsafe_allow_html=True,
-    )
+    st.markdown('<div class="side-divider"></div>', unsafe_allow_html=True)
 
-    # Résumé (sera mis à jour après filtrage)
     placeholder_resume = st.empty()
 
-    st.caption(
-        "Les indicateurs se recalculent automatiquement selon les filtres."
+    st.markdown(
+        '<div class="side-help">Les indicateurs et graphiques se recalculent automatiquement selon les filtres actifs.</div>',
+        unsafe_allow_html=True,
     )
 
 # ---- Calcul du df_filtre ----
@@ -778,43 +1168,64 @@ with st.sidebar:
         nb_signaux = len(df_filtre)
         st.markdown(
             f"""
-            <div style="display: flex; align-items: center; gap: 10px; background: rgba(255,255,255,0.05); border-radius: 8px; padding: 8px 12px; margin-top: 4px;">
-                <span style="font-size: 18px;">📊</span>
+            <div class="side-status">
+                <div class="side-status-icon">📊</div>
                 <div>
-                    <div style="font-size: 12px; color: #b9c8d8; font-weight: 500;">Signalements affichés</div>
-                    <div style="font-size: 20px; font-weight: 700; color: white; line-height: 1.2;">{nb_signaux}</div>
+                    <div class="side-status-label">Signalements affichés</div>
+                    <div class="side-status-value">{nb_signaux}</div>
                 </div>
             </div>
             """,
             unsafe_allow_html=True,
         )
 
-    # Export CSV
     csv_filtre = df_filtre.to_csv(index=False).encode("utf-8-sig")
     st.download_button(
-        "⬇️ Exporter les données filtrées (CSV)",
+        "⬇  Exporter les données filtrées",
         data=csv_filtre,
         file_name="emc_helpline_donnees_filtrees.csv",
         mime="text/csv",
         width="stretch",
     )
 
+    st.markdown(
+        """
+        <div class="side-footer">
+            EMC HELPLINE · CMRPI<br>
+            Analyse décisionnelle · 2025
+        </div>
+        """,
+        unsafe_allow_html=True,
+    )
+
 
 # =============================================================================
-# KPI CARDS
+# KPI PRINCIPAUX — synthèse non redondante
 # =============================================================================
 
+kpi1_f = kpi1_volume_par_mois(df_filtre)
+kpi3_f = kpi3_repartition_plateforme(df_filtre)
 kpi4_f = kpi4_taux_accompagnement(df_filtre)
+kpi5_f = kpi5_profil_victimes(df_filtre)
+
 if not isinstance(kpi4_f, dict):
     kpi4_f = dict(kpi4_f)
 kpi4_f["taux_global"] = float(kpi4_f.get("taux_global", 0))
 kpi4_f["nb_oui"] = int(kpi4_f.get("nb_oui", 0))
 
-kpi1_f = kpi1_volume_par_mois(df_filtre)
+# Mois le plus actif
 if not kpi1_f.empty:
     mois_pic = kpi1_f.loc[kpi1_f["nombre_signalements"].idxmax()]
 else:
     mois_pic = None
+
+# Genre et tranche d'âge dominants
+# Ils sont affichés dans les KPI du haut, conformément au retour de l'encadrante.
+top_genre = extraire_top_profil(kpi5_f.get("genre"), ["genre", "Genre"])
+top_age = extraire_top_profil(
+    kpi5_f.get("age"),
+    ["tranche_age", "tranche d'âge", "age", "Age"],
+)
 
 col1, col2, col3, col4 = st.columns(4)
 
@@ -826,15 +1237,8 @@ with col1:
         icone="📊",
         accent=NAVY,
     )
+
 with col2:
-    carte_kpi(
-        "Taux d'accompagnement",
-        f"{kpi4_f['taux_global']}%",
-        "demande explicite d'aide",
-        icone="🤝",
-        accent=TEAL,
-    )
-with col3:
     if mois_pic is not None:
         carte_kpi(
             "Mois le plus actif",
@@ -844,23 +1248,60 @@ with col3:
             accent=AMBER,
         )
     else:
-        carte_kpi("Mois le plus actif", "—", "Aucune donnée", icone="📈", accent=AMBER)
+        carte_kpi(
+            "Mois le plus actif",
+            "—",
+            "Aucune donnée",
+            icone="📈",
+            accent=AMBER,
+        )
+
+with col3:
+    if top_genre is not None:
+        libelle_genre, pct_genre = top_genre
+        genre_detail = f"{pct_genre:.1f}% des signalements renseignés" if pct_genre is not None else "Part non calculable"
+        carte_kpi(
+            "Genre majoritaire",
+            libelle_genre,
+            genre_detail,
+            icone="👤",
+            accent=NAVY_LIGHT,
+        )
+    else:
+        carte_kpi(
+            "Genre majoritaire",
+            "—",
+            "Aucune donnée renseignée",
+            icone="👤",
+            accent=NAVY_LIGHT,
+        )
+
 with col4:
-    carte_kpi(
-        "Plateformes sélectionnées",
-        len(st.session_state.plateformes_filtre),
-        "plateforme(s) active(s)",
-        icone="📱",
-        accent=INDIGO,
-    )
+    if top_age is not None:
+        libelle_age, pct_age = top_age
+        age_detail = f"{pct_age:.1f}% des signalements renseignés" if pct_age is not None else "Part non calculable"
+        carte_kpi(
+            "Tranche d'âge dominante",
+            libelle_age,
+            age_detail,
+            icone="🎂",
+            accent=AMBER,
+        )
+    else:
+        carte_kpi(
+            "Tranche d'âge dominante",
+            "—",
+            "Aucune donnée renseignée",
+            icone="🎂",
+            accent=AMBER,
+        )
 
 
 # =============================================================================
-# SECTION À RETENIR
+# SECTION « À RETENIR » — uniquement les enseignements complémentaires
 # =============================================================================
 
 kpi2_f = kpi2_repartition_type(df_filtre)
-kpi3_f = kpi3_repartition_plateforme(df_filtre)
 
 afficher_html(
     """
@@ -868,22 +1309,26 @@ afficher_html(
         <div class="retient-icon">💡</div>
         <div>
             <div class="retient-title">À retenir</div>
-            <div class="retient-subtitle">Les principaux enseignements de la période sélectionnée</div>
+            <div class="retient-subtitle">
+                Les principaux enseignements complémentaires de la période sélectionnée
+            </div>
         </div>
     </div>
     """
 )
 
-insights = []
+# Cette section ne répète volontairement PAS les KPI du haut :
+# - Signalements
+# - Mois le plus actif
+# - Genre majoritaire
+# - Tranche d'âge dominante
+#
+# Elle présente uniquement les trois enseignements complémentaires :
+# 1. Type dominant
+# 2. Plateforme dominante
+# 3. Accompagnement
 
-insights.append(
-    {
-        "icone": "📊",
-        "label": "Volume analysé",
-        "texte": f"{len(df_filtre)} signalement(s) correspondent aux filtres actuellement sélectionnés.",
-        "couleur": NAVY,
-    }
-)
+insights = []
 
 if not kpi2_f.empty:
     top_type = kpi2_f.iloc[0]
@@ -891,7 +1336,10 @@ if not kpi2_f.empty:
         {
             "icone": "⚠️",
             "label": "Type dominant",
-            "texte": f"Le type le plus fréquent est <strong>« {top_type['cyberharcelementType']} »</strong> avec <strong>{top_type['pourcentage']}%</strong> des signalements.",
+            "texte": (
+                f"<strong>{top_type['cyberharcelementType']}</strong> · "
+                f"{top_type['pourcentage']}% des signalements."
+            ),
             "couleur": CORAL,
         }
     )
@@ -902,7 +1350,10 @@ if not kpi3_f.empty:
         {
             "icone": "📱",
             "label": "Plateforme dominante",
-            "texte": f"La plateforme la plus représentée est <strong>« {top_plateforme['plateforme']} »</strong> avec <strong>{top_plateforme['pourcentage']}%</strong>.",
+            "texte": (
+                f"<strong>{top_plateforme['plateforme']}</strong> · "
+                f"{top_plateforme['pourcentage']}% des signalements."
+            ),
             "couleur": INDIGO,
         }
     )
@@ -911,44 +1362,28 @@ insights.append(
     {
         "icone": "🤝",
         "label": "Accompagnement",
-        "texte": f"Le taux de demande d'accompagnement est de <strong>{kpi4_f['taux_global']}%</strong>.",
+        "texte": (
+            f"<strong>{kpi4_f['nb_oui']}</strong> demande(s) explicite(s) d'aide · "
+            f"soit <strong>{kpi4_f['taux_global']}%</strong> des signalements."
+        ),
         "couleur": TEAL,
     }
 )
 
-if mois_pic is not None:
-    insights.append(
-        {
-            "icone": "📈",
-            "label": "Période la plus active",
-            "texte": f"Le mois le plus actif est <strong>{nom_mois(mois_pic['mois'])}</strong> avec <strong>{int(mois_pic['nombre_signalements'])}</strong> signalement(s).",
-            "couleur": AMBER,
-        }
+# Une seule chaîne HTML complète est envoyée à Streamlit.
+# Cela évite l'affichage accidentel du HTML brut entre deux cartes.
+panneau = '<div class="insight-panel">'
+for insight in insights:
+    panneau += carte_insight_html(
+        insight["icone"],
+        insight["label"],
+        insight["texte"],
+        insight["couleur"],
+        classe="insight-item",
     )
+panneau += "</div>"
 
-# Affichage en grille responsive (2 par ligne sur mobile, 5 sur desktop)
-if len(insights) <= 5:
-    cols = st.columns(len(insights))
-    for col, insight in zip(cols, insights):
-        with col:
-            carte_insight(
-                insight["icone"],
-                insight["label"],
-                insight["texte"],
-                insight["couleur"],
-            )
-else:
-    for i in range(0, len(insights), 3):
-        ligne = insights[i:i+3]
-        cols = st.columns(len(ligne))
-        for col, insight in zip(cols, ligne):
-            with col:
-                carte_insight(
-                    insight["icone"],
-                    insight["label"],
-                    insight["texte"],
-                    insight["couleur"],
-                )
+afficher_html(panneau)
 
 st.write("")
 
@@ -987,7 +1422,7 @@ with onglet1:
             fig1 = theme_graphique(graphique_kpi1(kpi1))
             fig1.update_layout(title="Évolution mensuelle des signalements")
             fig1.update_traces(line_color=NAVY, marker_color=NAVY)
-            st.plotly_chart(fig1, use_container_width=True)
+            st.plotly_chart(fig1, width="stretch")
             if (kpi1["nombre_signalements"] == 0).any():
                 legende(
                     "⚠️ Un ou plusieurs mois de la période sélectionnée ne comportent aucun signalement dans le fichier fourni."
@@ -998,7 +1433,7 @@ with onglet1:
         if not kpi2_f.empty:
             fig2 = theme_graphique(graphique_kpi2(kpi2_f))
             fig2.update_layout(title="Répartition par type de cyberharcèlement")
-            st.plotly_chart(fig2, use_container_width=True)
+            st.plotly_chart(fig2, width="stretch")
             type_principal = kpi2_f.iloc[0]
             legende(
                 f"Type le plus fréquent sur la période : <strong>{type_principal['cyberharcelementType']}</strong> ({type_principal['pourcentage']}%)."
@@ -1014,7 +1449,7 @@ with onglet2:
         if not kpi3_f.empty:
             fig3 = theme_graphique(graphique_kpi3(kpi3_f))
             fig3.update_layout(title="Répartition par plateforme")
-            st.plotly_chart(fig3, use_container_width=True)
+            st.plotly_chart(fig3, width="stretch")
             plateforme_principale = kpi3_f.iloc[0]
             legende(
                 f"Plateforme la plus représentée : <strong>{plateforme_principale['plateforme']}</strong> ({plateforme_principale['pourcentage']}%)."
@@ -1060,7 +1495,7 @@ with onglet3:
             )
             fig4 = theme_graphique(fig4)
             fig4.update_layout(height=280, margin=dict(t=60, b=20, l=20, r=20))
-            st.plotly_chart(fig4, use_container_width=True)
+            st.plotly_chart(fig4, width="stretch")
 
     with c2:
         with st.container(border=True):
@@ -1076,7 +1511,7 @@ with onglet3:
                     )
                 )
                 fig4d = theme_graphique(fig4d)
-                st.plotly_chart(fig4d, use_container_width=True)
+                st.plotly_chart(fig4d, width="stretch")
             else:
                 st.info("Aucune demande d'accompagnement sur la période sélectionnée.")
 
@@ -1143,7 +1578,7 @@ with onglet3:
                 color_discrete_sequence=[TEAL],
             )
             fig_accomp.update_traces(textposition="outside", marker_line_width=0)
-            st.plotly_chart(theme_graphique(fig_accomp), use_container_width=True)
+            st.plotly_chart(theme_graphique(fig_accomp), width="stretch")
         else:
             st.info("Aucun type d'accompagnement spécifié pour les demandes.")
 
@@ -1153,7 +1588,7 @@ with onglet3:
 # =============================================================================
 
 with onglet4:
-    kpi5 = kpi5_profil_victimes(df_filtre)
+    kpi5 = kpi5_f
     fig_genre, fig_age = graphique_kpi5(kpi5)
 
     c1, c2 = st.columns(2)
@@ -1163,7 +1598,7 @@ with onglet4:
             if not kpi5["genre"].empty:
                 fig_genre = theme_graphique(fig_genre)
                 fig_genre.update_layout(title="Répartition par genre")
-                st.plotly_chart(fig_genre, use_container_width=True)
+                st.plotly_chart(fig_genre, width="stretch")
             else:
                 st.info("Aucune donnée de genre renseignée sur la période sélectionnée.")
 
@@ -1172,7 +1607,7 @@ with onglet4:
             if not kpi5["age"].empty:
                 fig_age = theme_graphique(fig_age)
                 fig_age.update_layout(title="Répartition par tranche d'âge")
-                st.plotly_chart(fig_age, use_container_width=True)
+                st.plotly_chart(fig_age, width="stretch")
             else:
                 st.info("Aucune donnée d'âge renseignée sur la période sélectionnée.")
 
@@ -1254,7 +1689,7 @@ with onglet5:
         color_discrete_sequence=[NAVY, TEAL],
     )
     fig_comp.update_traces(textposition="outside", marker_line_width=0)
-    st.plotly_chart(theme_graphique(fig_comp), use_container_width=True)
+    st.plotly_chart(theme_graphique(fig_comp), width="stretch")
 
     st.divider()
 
@@ -1274,7 +1709,7 @@ with onglet5:
             color_discrete_sequence=[NAVY],
         )
         fig_top5.update_traces(textposition="outside", marker_line_width=0)
-        st.plotly_chart(theme_graphique(fig_top5), use_container_width=True)
+        st.plotly_chart(theme_graphique(fig_top5), width="stretch")
 
     st.divider()
 
@@ -1289,8 +1724,8 @@ with onglet5:
             labels={"value": "Nombre de signalements", "plateforme": "Plateforme", "variable": "Type de cyberharcèlement"},
             color_discrete_sequence=PALETTE_GRAPHIQUES,
         )
-        st.plotly_chart(theme_graphique(fig_croise), use_container_width=True)
-        st.dataframe(croise, use_container_width=True)
+        st.plotly_chart(theme_graphique(fig_croise), width="stretch")
+        st.dataframe(croise, width="stretch")
 
     st.divider()
 
@@ -1349,18 +1784,18 @@ with onglet6:
                 "Répartition par type de cyberharcèlement",
                 "Répartition par plateforme",
                 "Taux de demande d'accompagnement",
-                "Profil des victimes",
+                "Profil des victimes (genre et âge)",
             ],
             "Utilité": [
                 "Suivre l'évolution temporelle des signalements.",
                 "Identifier les formes de cyberharcèlement les plus fréquentes.",
                 "Identifier les plateformes les plus représentées.",
                 "Mesurer la proportion de signalements demandant un accompagnement.",
-                "Observer les distributions disponibles selon le genre et l'âge.",
+                "Analyser la répartition des victimes selon le genre et la tranche d'âge, avec synthèse des modalités dominantes dans « À retenir ».",
             ],
         }
     )
-    st.dataframe(documentation_kpi, use_container_width=True, hide_index=True)
+    st.dataframe(documentation_kpi, width="stretch", hide_index=True)
 
     st.markdown("### 🎛️ Filtres disponibles")
     st.markdown(
