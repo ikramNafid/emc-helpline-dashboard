@@ -80,14 +80,13 @@ TEXT_LIGHT = "#94a3b8"
 
 PALETTE_GRAPHIQUES = [NAVY, TEAL, INDIGO, AMBER, "#0891b2", "#7c3aed", "#059669", CORAL]
 
-POLICE_TITRE = "Manrope"
-POLICE_TEXTE = "Inter"
+# Polices avec secours pour éviter les problèmes de chargement sur Streamlit Cloud
+POLICE_TITRE = "Manrope, 'Segoe UI', 'Helvetica Neue', Arial, sans-serif"
+POLICE_TEXTE = "Inter, 'Segoe UI', 'Helvetica Neue', Arial, sans-serif"
 
 
 # =============================================================================
-# ICÔNES VECTORIELLES (remplacent les emojis, rendu identique sur toutes
-# les machines — Windows compris, où certains emojis s'affichent en
-# glyphes monochromes non désirés).
+# ICÔNES VECTORIELLES
 # =============================================================================
 
 def rgba(hex_color, alpha):
@@ -939,11 +938,14 @@ def injecter_css():
             color: #0f172a;
         }}
 
+        /* On supprime la règle qui peut cacher les titres sur Cloud */
+        /*
         .js-plotly-plot .gtitle {{
             white-space: nowrap !important;
             writing-mode: horizontal-tb !important;
             transform: none !important;
         }}
+        */
 
         div[data-testid="stHorizontalBlock"] {{
             align-items: stretch;
@@ -1050,7 +1052,8 @@ def theme_graphique(fig):
         title_font_color=NAVY,
         plot_bgcolor="rgba(0,0,0,0)",
         paper_bgcolor="rgba(0,0,0,0)",
-        margin=dict(t=60, l=20, r=20, b=40),
+        margin=dict(t=100, l=20, r=20, b=40),   # marge supérieure augmentée à 100
+        title_automargin=True,                  # ajustement automatique des marges
     )
     fig.update_xaxes(gridcolor="#eef1f6", linecolor=BORDER, zeroline=False)
     fig.update_yaxes(gridcolor="#eef1f6", linecolor=BORDER, zeroline=False)
@@ -1091,13 +1094,11 @@ def extraire_top_profil(tableau, colonnes_label):
 
     tableau = tableau.copy()
 
-    # Recherche souple du nom de la colonne contenant le libellé.
     colonne_label = next(
         (c for c in colonnes_label if c in tableau.columns),
         tableau.columns[0],
     )
 
-    # Recherche souple de la colonne de pourcentage.
     colonne_pct = next(
         (c for c in ["pourcentage", "Pourcentage", "pct", "percentage"] if c in tableau.columns),
         None,
@@ -1113,7 +1114,6 @@ def extraire_top_profil(tableau, colonnes_label):
         except (TypeError, ValueError):
             pass
 
-    # Si le module KPI ne fournit pas de pourcentage, on le recalcule.
     colonne_nombre = next(
         (c for c in ["nombre", "count", "Nombre"] if c in tableau.columns),
         None,
@@ -1414,8 +1414,6 @@ kpi2_f = kpi2_repartition_type(df_filtre)
 kpi3_f = kpi3_repartition_plateforme(df_filtre)
 kpi5_f = kpi5_profil_victimes(df_filtre)
 
-# Profil synthétique des victimes : ces deux indicateurs sont affichés
-# dans « À retenir » et restent cohérents avec l'onglet « Profil des victimes ».
 top_genre = extraire_top_profil(kpi5_f.get("genre"), ["genre", "Genre"])
 top_age = extraire_top_profil(kpi5_f.get("age"), ["tranche_age", "tranche d'âge", "age", "Age"])
 
@@ -1432,10 +1430,6 @@ afficher_html(
 )
 
 insights = []
-
-# Les informations sont volontairement courtes dans « À retenir » :
-# la section sert de synthèse décisionnelle, tandis que les onglets
-# présentent les analyses détaillées.
 
 if not kpi2_f.empty:
     top_type = kpi2_f.iloc[0]
@@ -1459,7 +1453,6 @@ if not kpi3_f.empty:
         }
     )
 
-# Genre et âge : deux indicateurs indépendants dans « À retenir ».
 if top_genre is not None:
     libelle_genre, pct_genre = top_genre
     genre_detail = f"{pct_genre:.1f}%" if pct_genre is not None else "—"
@@ -1484,9 +1477,6 @@ if top_age is not None:
         }
     )
 
-# Affichage sécurisé des cartes « À retenir » :
-# chaque carte est rendue dans son propre bloc Streamlit afin d'éviter
-# que Streamlit affiche le HTML brut lorsqu'il y a plusieurs <div> imbriqués.
 colonnes_insights = st.columns(4, gap="medium")
 for index, insight in enumerate(insights):
     with colonnes_insights[index % 4]:
@@ -1506,8 +1496,6 @@ st.write("")
 # =============================================================================
 # SECTIONS — ONGLETS HORIZONTAUX
 # =============================================================================
-# Les 6 sections sont désormais présentées comme des onglets côte à côte
-# (navigation horizontale), plutôt qu'empilées verticalement en accordéons.
 
 onglet1, onglet2, onglet3, onglet4, onglet5, onglet6 = st.tabs([
     "📈  Volume & Types",
@@ -1528,9 +1516,12 @@ with onglet1:
         kpi1 = kpi1_volume_par_mois(df_filtre)
         if not kpi1.empty:
             fig1 = theme_graphique(graphique_kpi1(kpi1))
-            fig1.update_layout(title="Évolution mensuelle des signalements")
+            fig1.update_layout(
+                title="Évolution mensuelle des signalements",
+                height=420,
+            )
             fig1.update_traces(line_color=NAVY, marker_color=NAVY)
-            st.plotly_chart(fig1, width="stretch")
+            st.plotly_chart(fig1, use_container_width=True, config={'responsive': True})
             if (kpi1["nombre_signalements"] == 0).any():
                 legende(
                     "⚠️ Un ou plusieurs mois de la période sélectionnée ne comportent aucun signalement dans le fichier fourni."
@@ -1540,8 +1531,11 @@ with onglet1:
     with st.container(border=True):
         if not kpi2_f.empty:
             fig2 = theme_graphique(graphique_kpi2(kpi2_f))
-            fig2.update_layout(title="Répartition par type de cyberharcèlement")
-            st.plotly_chart(fig2, width="stretch")
+            fig2.update_layout(
+                title="Répartition par type de cyberharcèlement",
+                height=420,
+            )
+            st.plotly_chart(fig2, use_container_width=True, config={'responsive': True})
             type_principal = kpi2_f.iloc[0]
             legende(
                 f"Type le plus fréquent sur la période : <strong>{type_principal['cyberharcelementType']}</strong> ({type_principal['pourcentage']}%)."
@@ -1556,8 +1550,11 @@ with onglet2:
     with st.container(border=True):
         if not kpi3_f.empty:
             fig3 = theme_graphique(graphique_kpi3(kpi3_f))
-            fig3.update_layout(title="Répartition par plateforme")
-            st.plotly_chart(fig3, width="stretch")
+            fig3.update_layout(
+                title="Répartition par plateforme",
+                height=420,
+            )
+            st.plotly_chart(fig3, use_container_width=True, config={'responsive': True})
             plateforme_principale = kpi3_f.iloc[0]
             legende(
                 f"Plateforme la plus représentée : <strong>{plateforme_principale['plateforme']}</strong> ({plateforme_principale['pourcentage']}%)."
@@ -1565,7 +1562,7 @@ with onglet2:
 
 
 # =============================================================================
-# ONGLET 3 — Accompagnement (avec jauge personnalisée, sous-titre supprimé)
+# ONGLET 3 — Accompagnement
 # =============================================================================
 
 with onglet3:
@@ -1574,11 +1571,19 @@ with onglet3:
     with c1:
         with st.container(border=True):
             fig4 = graphique_kpi4(kpi4_f)
-            # Suppression du sous-titre "KPI 4 - ..."
-            fig4.update_layout(title=None, title_text="")
+            # On définit directement le titre sans passer par None
+            fig4.update_layout(
+                title=dict(
+                    text="Part des demandes d'accompagnement",
+                    font=dict(size=18, color=NAVY, family=POLICE_TITRE),
+                    x=0.5,
+                    xanchor='center',
+                    y=0.95
+                ),
+                height=280,
+            )
+            # Personnalisation de la jauge
             if fig4.data and fig4.data[0].type == 'indicator':
-                fig4.data[0].title = None  # <-- suppression définitive
-                # Personnalisation de la jauge
                 gauge_obj = fig4.data[0].gauge
                 gauge_obj.bar.color = TEAL
                 gauge_obj.steps = [
@@ -1592,34 +1597,27 @@ with onglet3:
                 fig4.data[0].number.font.color = NAVY
                 fig4.data[0].number.suffix = '%'
                 gauge_obj.bar.thickness = 0.4
-            # Titre personnalisé
-            fig4.update_layout(
-                title=dict(
-                    text="Part des demandes d'accompagnement",
-                    font=dict(size=18, color=NAVY, family=POLICE_TITRE),
-                    x=0.5,
-                    xanchor='center'
-                )
-            )
             fig4 = theme_graphique(fig4)
-            fig4.update_layout(height=280, margin=dict(t=60, b=20, l=20, r=20))
-            st.plotly_chart(fig4, width="stretch")
+            fig4.update_layout(
+                margin=dict(t=80, l=20, r=20, b=20)  # on réduit le bas pour la jauge
+            )
+            st.plotly_chart(fig4, use_container_width=True, config={'responsive': True})
 
     with c2:
         with st.container(border=True):
             if kpi4_f["nb_oui"] > 0:
                 fig4d = graphique_kpi4_detail(kpi4_f)
-                fig4d.update_layout(title=None, title_text="")
                 fig4d.update_layout(
                     title=dict(
                         text="Types d'accompagnement demandés",
                         font=dict(size=18, color=NAVY, family=POLICE_TITRE),
                         x=0.5,
                         xanchor='center'
-                    )
+                    ),
+                    height=420,
                 )
                 fig4d = theme_graphique(fig4d)
-                st.plotly_chart(fig4d, width="stretch")
+                st.plotly_chart(fig4d, use_container_width=True, config={'responsive': True})
             else:
                 st.info("Aucune demande d'accompagnement sur la période sélectionnée.")
 
@@ -1657,7 +1655,7 @@ with onglet3:
             accent=AMBER,
         )
 
-    # Graphique alternatif des types d'accompagnement (propre)
+    # Graphique alternatif des types d'accompagnement
     if nb_oui > 0:
         types_bruts = df_filtre.loc[
             df_filtre["accompagnement"].astype(str).str.strip().str.lower() == "oui",
@@ -1686,7 +1684,8 @@ with onglet3:
                 color_discrete_sequence=[TEAL],
             )
             fig_accomp.update_traces(textposition="outside", marker_line_width=0)
-            st.plotly_chart(theme_graphique(fig_accomp), width="stretch")
+            fig_accomp.update_layout(height=420)
+            st.plotly_chart(theme_graphique(fig_accomp), use_container_width=True, config={'responsive': True})
         else:
             st.info("Aucun type d'accompagnement spécifié pour les demandes.")
 
@@ -1705,8 +1704,11 @@ with onglet4:
         with st.container(border=True):
             if not kpi5["genre"].empty:
                 fig_genre = theme_graphique(fig_genre)
-                fig_genre.update_layout(title="Répartition par genre")
-                st.plotly_chart(fig_genre, width="stretch")
+                fig_genre.update_layout(
+                    title="Répartition par genre",
+                    height=420,
+                )
+                st.plotly_chart(fig_genre, use_container_width=True, config={'responsive': True})
             else:
                 st.info("Aucune donnée de genre renseignée sur la période sélectionnée.")
 
@@ -1714,14 +1716,17 @@ with onglet4:
         with st.container(border=True):
             if not kpi5["age"].empty:
                 fig_age = theme_graphique(fig_age)
-                fig_age.update_layout(title="Répartition par tranche d'âge")
-                st.plotly_chart(fig_age, width="stretch")
+                fig_age.update_layout(
+                    title="Répartition par tranche d'âge",
+                    height=420,
+                )
+                st.plotly_chart(fig_age, use_container_width=True, config={'responsive': True})
             else:
                 st.info("Aucune donnée d'âge renseignée sur la période sélectionnée.")
 
 
 # =============================================================================
-# ONGLET 5 — Comparaison & Analyses (amélioré)
+# ONGLET 5 — Comparaison & Analyses
 # =============================================================================
 
 with onglet5:
@@ -1797,7 +1802,8 @@ with onglet5:
         color_discrete_sequence=[NAVY, TEAL],
     )
     fig_comp.update_traces(textposition="outside", marker_line_width=0)
-    st.plotly_chart(theme_graphique(fig_comp), width="stretch")
+    fig_comp.update_layout(height=420)
+    st.plotly_chart(theme_graphique(fig_comp), use_container_width=True, config={'responsive': True})
 
     st.divider()
 
@@ -1817,7 +1823,8 @@ with onglet5:
             color_discrete_sequence=[NAVY],
         )
         fig_top5.update_traces(textposition="outside", marker_line_width=0)
-        st.plotly_chart(theme_graphique(fig_top5), width="stretch")
+        fig_top5.update_layout(height=420)
+        st.plotly_chart(theme_graphique(fig_top5), use_container_width=True, config={'responsive': True})
 
     st.divider()
 
@@ -1832,7 +1839,8 @@ with onglet5:
             labels={"value": "Nombre de signalements", "plateforme": "Plateforme", "variable": "Type de cyberharcèlement"},
             color_discrete_sequence=PALETTE_GRAPHIQUES,
         )
-        st.plotly_chart(theme_graphique(fig_croise), width="stretch")
+        fig_croise.update_layout(height=420)
+        st.plotly_chart(theme_graphique(fig_croise), use_container_width=True, config={'responsive': True})
         st.dataframe(croise, width="stretch")
 
     st.divider()
