@@ -16,6 +16,15 @@ Version Finale - Design Executive Premium, responsive, compatible Streamlit
 - page Documentation
 
 Améliorations : design Executive Premium, sidebar élégante, cartes « À retenir » individuelles, hiérarchie visuelle renforcée, responsive, rendu HTML compatible avec les versions Streamlit ne supportant pas st.html.
+
+CORRECTIF (v.2) : tous les titres de graphiques Plotly sont désormais définis
+via un dictionnaire complet (text/font/x/xanchor/y) au lieu d'une simple
+chaîne de caractères. Sur Streamlit Cloud, un titre passé comme chaîne
+simple après un appel à theme_graphique() (qui fixe title_font_family /
+title_font_size / title_font_color via les propriétés "magic underscore")
+peut ne pas s'afficher selon la version de Plotly installée. Le format
+dict est fiable sur toutes les versions et correspond à celui déjà utilisé
+avec succès pour fig4 / fig4d.
 """
 
 import streamlit as st
@@ -83,6 +92,25 @@ PALETTE_GRAPHIQUES = [NAVY, TEAL, INDIGO, AMBER, "#0891b2", "#7c3aed", "#059669"
 # Polices avec secours pour éviter les problèmes de chargement sur Streamlit Cloud
 POLICE_TITRE = "Manrope, 'Segoe UI', 'Helvetica Neue', Arial, sans-serif"
 POLICE_TEXTE = "Inter, 'Segoe UI', 'Helvetica Neue', Arial, sans-serif"
+
+
+# =============================================================================
+# TITRES DE GRAPHIQUES — helper centralisé
+# =============================================================================
+
+def titre_graphique(texte, y=0.95):
+    """
+    Retourne un dict de titre Plotly complet (text/font/x/xanchor/y).
+    À utiliser systématiquement à la place de title="chaîne simple",
+    qui ne s'affiche pas de façon fiable sur Streamlit Cloud.
+    """
+    return dict(
+        text=texte,
+        font=dict(size=18, color=NAVY, family=POLICE_TITRE),
+        x=0.5,
+        xanchor="center",
+        y=y,
+    )
 
 
 # =============================================================================
@@ -919,8 +947,8 @@ def injecter_css():
             margin-top: 30px;
         }}
 
-        
-        /* ===== Titres des graphiques ===== */
+
+        /* ===== Titres des graphiques (conteneur HTML, hors Plotly) ===== */
         .chart-title,
         .graph-title,
         .section-chart-title {{
@@ -937,15 +965,6 @@ def injecter_css():
             margin: 0 0 10px 0;
             color: #0f172a;
         }}
-
-        /* On supprime la règle qui peut cacher les titres sur Cloud */
-        /*
-        .js-plotly-plot .gtitle {{
-            white-space: nowrap !important;
-            writing-mode: horizontal-tb !important;
-            transform: none !important;
-        }}
-        */
 
         div[data-testid="stHorizontalBlock"] {{
             align-items: stretch;
@@ -1047,9 +1066,6 @@ def afficher_alerte_pic(mois, nombre, seuil):
 def theme_graphique(fig):
     fig.update_layout(
         font_family=POLICE_TEXTE,
-        title_font_family=POLICE_TITRE,
-        title_font_size=18,
-        title_font_color=NAVY,
         plot_bgcolor="rgba(0,0,0,0)",
         paper_bgcolor="rgba(0,0,0,0)",
         margin=dict(t=100, l=20, r=20, b=40),   # marge supérieure augmentée à 100
@@ -1517,7 +1533,7 @@ with onglet1:
         if not kpi1.empty:
             fig1 = theme_graphique(graphique_kpi1(kpi1))
             fig1.update_layout(
-                title="Évolution mensuelle des signalements",
+                title=titre_graphique("Évolution mensuelle des signalements"),
                 height=420,
             )
             fig1.update_traces(line_color=NAVY, marker_color=NAVY)
@@ -1532,7 +1548,7 @@ with onglet1:
         if not kpi2_f.empty:
             fig2 = theme_graphique(graphique_kpi2(kpi2_f))
             fig2.update_layout(
-                title="Répartition par type de cyberharcèlement",
+                title=titre_graphique("Répartition par type de cyberharcèlement"),
                 height=420,
             )
             st.plotly_chart(fig2, use_container_width=True, config={'responsive': True})
@@ -1551,7 +1567,7 @@ with onglet2:
         if not kpi3_f.empty:
             fig3 = theme_graphique(graphique_kpi3(kpi3_f))
             fig3.update_layout(
-                title="Répartition par plateforme",
+                title=titre_graphique("Répartition par plateforme"),
                 height=420,
             )
             st.plotly_chart(fig3, use_container_width=True, config={'responsive': True})
@@ -1573,13 +1589,7 @@ with onglet3:
             fig4 = graphique_kpi4(kpi4_f)
             # On définit directement le titre sans passer par None
             fig4.update_layout(
-                title=dict(
-                    text="Part des demandes d'accompagnement",
-                    font=dict(size=18, color=NAVY, family=POLICE_TITRE),
-                    x=0.5,
-                    xanchor='center',
-                    y=0.95
-                ),
+                title=titre_graphique("Part des demandes d'accompagnement"),
                 height=280,
             )
             # Personnalisation de la jauge
@@ -1608,12 +1618,7 @@ with onglet3:
             if kpi4_f["nb_oui"] > 0:
                 fig4d = graphique_kpi4_detail(kpi4_f)
                 fig4d.update_layout(
-                    title=dict(
-                        text="Types d'accompagnement demandés",
-                        font=dict(size=18, color=NAVY, family=POLICE_TITRE),
-                        x=0.5,
-                        xanchor='center'
-                    ),
+                    title=titre_graphique("Types d'accompagnement demandés"),
                     height=420,
                 )
                 fig4d = theme_graphique(fig4d)
@@ -1679,12 +1684,14 @@ with onglet3:
                 x="typeAccompagnement",
                 y="nombre",
                 text="nombre",
-                title="Répartition des types d'accompagnement demandés",
                 labels={"typeAccompagnement": "Type d'accompagnement", "nombre": "Nombre de demandes"},
                 color_discrete_sequence=[TEAL],
             )
             fig_accomp.update_traces(textposition="outside", marker_line_width=0)
-            fig_accomp.update_layout(height=420)
+            fig_accomp.update_layout(
+                title=titre_graphique("Répartition des types d'accompagnement demandés"),
+                height=420,
+            )
             st.plotly_chart(theme_graphique(fig_accomp), use_container_width=True, config={'responsive': True})
         else:
             st.info("Aucun type d'accompagnement spécifié pour les demandes.")
@@ -1705,7 +1712,7 @@ with onglet4:
             if not kpi5["genre"].empty:
                 fig_genre = theme_graphique(fig_genre)
                 fig_genre.update_layout(
-                    title="Répartition par genre",
+                    title=titre_graphique("Répartition par genre"),
                     height=420,
                 )
                 st.plotly_chart(fig_genre, use_container_width=True, config={'responsive': True})
@@ -1717,7 +1724,7 @@ with onglet4:
             if not kpi5["age"].empty:
                 fig_age = theme_graphique(fig_age)
                 fig_age.update_layout(
-                    title="Répartition par tranche d'âge",
+                    title=titre_graphique("Répartition par tranche d'âge"),
                     height=420,
                 )
                 st.plotly_chart(fig_age, use_container_width=True, config={'responsive': True})
@@ -1797,12 +1804,14 @@ with onglet5:
         x="Période",
         y="Signalements",
         text="Signalements",
-        title="Comparaison du volume de signalements",
         color="Période",
         color_discrete_sequence=[NAVY, TEAL],
     )
     fig_comp.update_traces(textposition="outside", marker_line_width=0)
-    fig_comp.update_layout(height=420)
+    fig_comp.update_layout(
+        title=titre_graphique("Comparaison du volume de signalements"),
+        height=420,
+    )
     st.plotly_chart(theme_graphique(fig_comp), use_container_width=True, config={'responsive': True})
 
     st.divider()
@@ -1818,12 +1827,14 @@ with onglet5:
             y="cyberharcelementType",
             orientation="h",
             text="nombre",
-            title="Top 5 des types de cyberharcèlement",
             labels={"cyberharcelementType": "Type", "nombre": "Nombre de signalements"},
             color_discrete_sequence=[NAVY],
         )
         fig_top5.update_traces(textposition="outside", marker_line_width=0)
-        fig_top5.update_layout(height=420)
+        fig_top5.update_layout(
+            title=titre_graphique("Top 5 des types de cyberharcèlement"),
+            height=420,
+        )
         st.plotly_chart(theme_graphique(fig_top5), use_container_width=True, config={'responsive': True})
 
     st.divider()
@@ -1835,11 +1846,13 @@ with onglet5:
         fig_croise = px.bar(
             croise,
             barmode="stack",
-            title="Répartition des types de cyberharcèlement par plateforme",
             labels={"value": "Nombre de signalements", "plateforme": "Plateforme", "variable": "Type de cyberharcèlement"},
             color_discrete_sequence=PALETTE_GRAPHIQUES,
         )
-        fig_croise.update_layout(height=420)
+        fig_croise.update_layout(
+            title=titre_graphique("Répartition des types de cyberharcèlement par plateforme"),
+            height=420,
+        )
         st.plotly_chart(theme_graphique(fig_croise), use_container_width=True, config={'responsive': True})
         st.dataframe(croise, width="stretch")
 
