@@ -896,6 +896,10 @@ def injecter_css():
             padding-bottom: 0;
             margin-bottom: 4px;
         }}
+        .stTabs [data-baseweb="tab-list"] {{
+            overflow-x: auto;
+            flex-wrap: nowrap;
+        }}
         .stTabs [data-baseweb="tab"] {{
             height: auto;
             padding: 12px 20px;
@@ -907,6 +911,18 @@ def injecter_css():
             color: {TEXT_MUTED};
             border: none;
             transition: all .15s ease;
+            max-width: none !important;
+            flex: 0 0 auto;
+        }}
+        /* Correctif : sur les versions récentes de Streamlit, le texte des
+           onglets INACTIFS peut être réduit/masqué pour gagner de la place.
+           On force explicitement la largeur et la visibilité du <p> interne
+           qui porte le libellé, pour tous les onglets (actifs ou non). */
+        .stTabs [data-baseweb="tab"] p {{
+            max-width: none !important;
+            overflow: visible !important;
+            white-space: nowrap !important;
+            opacity: 1 !important;
         }}
         .stTabs [data-baseweb="tab"]:hover {{
             background: #f1f5f9;
