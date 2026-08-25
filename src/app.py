@@ -580,150 +580,170 @@ def injecter_css():
 
 
         /* =========================================================
-           KPI CARDS (modernisées)
+           KPI CARDS — EXECUTIVE / PREMIUM
         ========================================================= */
-
         .kpi-card {{
-            background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%);
-            border: 1px solid #e2e8f0;
-            border-radius: 16px;
-            padding: 20px 22px;
-            min-height: 120px;
-            box-shadow: 0 4px 14px rgba(15, 23, 42, 0.07);
+            --accent: {TEAL};
             position: relative;
+            min-height: 142px;
+            padding: 19px 20px 18px;
+            background: #ffffff;
+            border: 1px solid #e5eaf0;
+            border-radius: 18px;
+            box-shadow: 0 7px 22px rgba(15, 23, 42, 0.055);
             overflow: hidden;
-            transition: transform 0.2s ease, box-shadow 0.2s ease;
             display: flex;
             flex-direction: column;
-        }}
-        .kpi-card:hover {{
-            transform: translateY(-3px);
-            box-shadow: 0 12px 32px rgba(15, 23, 42, 0.12);
+            justify-content: space-between;
+            transition: transform .18s ease, box-shadow .18s ease, border-color .18s ease;
         }}
         .kpi-card::before {{
             content: "";
             position: absolute;
-            left: 0;
             top: 0;
-            bottom: 0;
-            width: 5px;
+            left: 0;
+            right: 0;
+            height: 4px;
             background: var(--accent);
-            border-radius: 0 4px 4px 0;
+        }}
+        .kpi-card::after {{
+            content: "";
+            position: absolute;
+            width: 120px;
+            height: 120px;
+            right: -72px;
+            bottom: -72px;
+            border-radius: 50%;
+            background: var(--accent);
+            opacity: .045;
+            pointer-events: none;
+        }}
+        .kpi-card:hover {{
+            transform: translateY(-3px);
+            border-color: rgba(15, 23, 42, .10);
+            box-shadow: 0 14px 34px rgba(15, 23, 42, .10);
         }}
         .kpi-top {{
             display: flex;
-            align-items: center;
+            align-items: flex-start;
             justify-content: space-between;
-            margin-bottom: 8px;
+            gap: 14px;
+            margin-bottom: 12px;
         }}
-        .kpi-icon {{
-            font-size: 24px;
-            opacity: 0.8;
+        .carte-label {{
+            color: #64748b;
+            font-size: 10px;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: .085em;
+            line-height: 1.3;
+            padding-top: 4px;
         }}
         .kpi-icon-box {{
-            width: 36px;
-            height: 36px;
-            min-width: 36px;
+            width: 42px;
+            height: 42px;
+            min-width: 42px;
             display: flex;
             align-items: center;
             justify-content: center;
-            border-radius: 10px;
-        }}
-        .carte-label {{
-            color: {TEXT_MUTED};
-            font-size: 11px;
-            font-weight: 700;
-            text-transform: uppercase;
-            letter-spacing: 0.05em;
+            border-radius: 12px;
+            box-shadow: inset 0 0 0 1px rgba(15,23,42,.035);
         }}
         .carte-valeur {{
             color: {NAVY};
             font-family: '{POLICE_TITRE}', sans-serif;
-            font-size: 30px;
+            font-size: 32px;
             font-weight: 800;
-            line-height: 1.15;
+            line-height: 1.05;
+            letter-spacing: -.025em;
             margin-top: 2px;
+            overflow-wrap: anywhere;
         }}
         .carte-detail {{
-            color: {TEXT_MUTED};
-            font-size: 13px;
+            color: #64748b;
+            font-size: 12px;
             font-weight: 500;
-            margin-top: 4px;
+            line-height: 1.35;
+            margin-top: 8px;
+        }}
+        /* Harmonisation des lignes Streamlit contenant les KPI */
+        div[data-testid="stHorizontalBlock"]:has(.kpi-card) {{
+            gap: 18px;
+            margin-bottom: 4px;
+        }}
+        div[data-testid="stHorizontalBlock"]:has(.kpi-card) > div[data-testid="column"] {{
+            min-width: 0;
         }}
 
-
         /* =========================================================
-           SECTION « À RETENIR » — DESIGN PREMIUM / EXECUTIVE
+           SECTION « À RETENIR » — EXECUTIVE SUMMARY
         ========================================================= */
-
         .retient-header {{
             display: flex;
             align-items: center;
-            gap: 13px;
-            margin-top: 30px;
-            margin-bottom: 15px;
-            padding-left: 2px;
+            gap: 12px;
+            margin-top: 27px;
+            margin-bottom: 13px;
+            padding: 0 2px;
         }}
         .retient-icon {{
-            width: 38px;
-            height: 38px;
+            width: 40px;
+            height: 40px;
             display: flex;
             align-items: center;
             justify-content: center;
-            background: linear-gradient(145deg, #fffaf0, #fff6df);
-            border: 1px solid #f0dfbd;
-            border-radius: 10px;
-            font-size: 18px;
-            box-shadow: 0 3px 10px rgba(15, 23, 42, 0.04);
+            background: #fff8e8;
+            border: 1px solid #f5dfb0;
+            border-radius: 12px;
+            color: {AMBER};
+            box-shadow: 0 4px 12px rgba(217,119,6,.08);
         }}
         .retient-title {{
             color: {NAVY};
             font-family: '{POLICE_TITRE}', sans-serif;
-            font-size: 21px;
+            font-size: 20px;
             font-weight: 800;
-            line-height: 1.15;
-            letter-spacing: -0.01em;
+            line-height: 1.1;
         }}
         .retient-subtitle {{
-            color: {TEXT_MUTED};
-            font-size: 12px;
-            margin-top: 3px;
+            color: #718096;
+            font-size: 11px;
+            margin-top: 4px;
             font-weight: 500;
         }}
-
-        /* Cartes « À retenir » — version Executive
-           Les 7 cartes restent indépendantes et conservent leur identité. */
         .insight-panel {{
             display: grid;
             grid-template-columns: repeat(4, minmax(0, 1fr));
             gap: 14px;
-            align-items: stretch;
         }}
-
         .insight-item {{
             --accent: {NAVY};
             position: relative;
-            min-height: 108px;
-            padding: 16px 17px 15px 18px;
-            background: linear-gradient(180deg, #ffffff 0%, #fbfcfe 100%);
-            border: 1px solid #e3e9ef;
-            border-radius: 11px;
-            box-shadow: 0 2px 8px rgba(15,23,42,.045);
+            min-height: 106px;
+            padding: 16px 17px;
+            background: #ffffff;
+            border: 1px solid #e7ebf0;
+            border-radius: 15px;
+            box-shadow: 0 5px 16px rgba(15,23,42,.045);
             overflow: hidden;
-            transition: transform .18s ease, box-shadow .18s ease, border-color .18s ease;
+            transition: transform .18s ease, box-shadow .18s ease;
         }}
         .insight-item::before {{
             content: '';
             position: absolute;
-            top: 0; left: 0; right: 0;
+            top: 0;
+            left: 0;
+            width: 100%;
             height: 3px;
             background: var(--accent);
         }}
         .insight-item::after {{
             content: '';
             position: absolute;
-            width: 80px; height: 80px;
-            right: -42px; bottom: -42px;
+            width: 95px;
+            height: 95px;
+            right: -55px;
+            bottom: -55px;
             border-radius: 50%;
             background: var(--accent);
             opacity: .035;
@@ -731,111 +751,51 @@ def injecter_css():
         }}
         .insight-item:hover {{
             transform: translateY(-2px);
-            border-color: #d7e0e8;
-            box-shadow: 0 7px 20px rgba(15,23,42,.075);
+            box-shadow: 0 11px 25px rgba(15,23,42,.08);
         }}
-
         .insight-top {{
             display: flex;
             align-items: center;
             gap: 9px;
-            margin-bottom: 10px;
+            margin-bottom: 11px;
         }}
         .insight-icon {{
-            width: 30px; height: 30px;
+            width: 31px;
+            height: 31px;
+            min-width: 31px;
             display: flex;
             align-items: center;
             justify-content: center;
-            border-radius: 8px;
-            font-size: 14px;
-            flex: 0 0 30px;
+            border-radius: 9px;
             border: 1px solid rgba(15,23,42,.035);
         }}
         .insight-label {{
             color: #64748b;
             font-size: 9px;
             text-transform: uppercase;
-            letter-spacing: .075em;
+            letter-spacing: .08em;
             font-weight: 800;
             line-height: 1.25;
         }}
         .insight-text {{
-            color: #475569;
-            font-size: 12px;
+            color: #64748b;
+            font-size: 11.5px;
             line-height: 1.45;
             padding-left: 1px;
-            max-width: 96%;
+            max-width: 98%;
         }}
         .insight-text strong {{
-            display: inline-block;
             color: {NAVY};
             font-family: '{POLICE_TITRE}', sans-serif;
             font-size: 15px;
             font-weight: 800;
-            line-height: 1.2;
-            margin-right: 2px;
         }}
-
-        /* Les cartes profil reprennent exactement le même langage visuel. */
-        .insight-profile {{
-            --accent: {NAVY_LIGHT};
-            position: relative;
-            min-height: 108px;
-            padding: 16px 17px 15px 18px;
-            background: linear-gradient(180deg, #ffffff 0%, #fbfcfe 100%);
-            border: 1px solid #e3e9ef;
-            border-radius: 11px;
-            box-shadow: 0 2px 8px rgba(15,23,42,.045);
-            overflow: hidden;
-        }}
-        .insight-profile::before {{
-            content: '';
-            position: absolute;
-            top: 0; left: 0; right: 0;
-            height: 3px;
-            background: linear-gradient(90deg, {NAVY_LIGHT}, {AMBER});
-        }}
-        .insight-profile .insight-top {{ margin-bottom: 10px; }}
-        .profil-synthese {{
-            display: grid;
-            grid-template-columns: 1fr;
-            gap: 7px;
-        }}
-        .profil-mini {{
-            background: #f8fafc;
-            border: 1px solid #e7edf3;
-            border-left: 3px solid var(--mini-accent);
-            border-radius: 7px;
-            padding: 6px 9px;
-        }}
-        .profil-mini-label {{
-            color: #7a8796;
-            font-size: 7.5px;
-            font-weight: 800;
-            text-transform: uppercase;
-            letter-spacing: .06em;
-            margin-bottom: 1px;
-        }}
-        .profil-mini-value {{
-            color: {NAVY};
-            font-size: 11px;
-            font-weight: 800;
-            line-height: 1.2;
-        }}
-        .profil-mini-detail {{
-            color: #64748b;
-            font-size: 8.5px;
-            margin-top: 1px;
-        }}
-
         @media (max-width: 1150px) {{
-            .insight-panel {{ grid-template-columns: repeat(3, minmax(0, 1fr)); }}
-        }}
-        @media (max-width: 800px) {{
             .insight-panel {{ grid-template-columns: repeat(2, minmax(0, 1fr)); }}
         }}
-        @media (max-width: 560px) {{
+        @media (max-width: 650px) {{
             .insight-panel {{ grid-template-columns: 1fr; gap: 10px; }}
+            .kpi-card {{ min-height: 132px; }}
         }}
 
         /* =========================================================
@@ -1387,19 +1347,19 @@ with st.sidebar:
 # KPI CARDS
 # =============================================================================
 
-kpi4_f = kpi4_taux_accompagnement(df_filtre)
-if not isinstance(kpi4_f, dict):
-    kpi4_f = dict(kpi4_f)
-kpi4_f["taux_global"] = float(kpi4_f.get("taux_global", 0))
-kpi4_f["nb_oui"] = int(kpi4_f.get("nb_oui", 0))
+# =============================================================================
+# KPI CARDS — VUE INITIALE
+# =============================================================================
 
 kpi1_f = kpi1_volume_par_mois(df_filtre)
+
 if not kpi1_f.empty:
     mois_pic = kpi1_f.loc[kpi1_f["nombre_signalements"].idxmax()]
 else:
     mois_pic = None
 
-col1, col2, col3, col4 = st.columns(4)
+# 3 cartes principales uniquement
+col1, col2, col3 = st.columns(3)
 
 with col1:
     carte_kpi(
@@ -1409,15 +1369,8 @@ with col1:
         icone="bar_chart",
         accent=NAVY,
     )
+
 with col2:
-    carte_kpi(
-        "Taux d'accompagnement",
-        f"{kpi4_f['taux_global']}%",
-        "demande explicite d'aide",
-        icone="heart",
-        accent=TEAL,
-    )
-with col3:
     if mois_pic is not None:
         carte_kpi(
             "Mois le plus actif",
@@ -1427,8 +1380,15 @@ with col3:
             accent=AMBER,
         )
     else:
-        carte_kpi("Mois le plus actif", "—", "Aucune donnée", icone="calendar", accent=AMBER)
-with col4:
+        carte_kpi(
+            "Mois le plus actif",
+            "—",
+            "Aucune donnée",
+            icone="calendar",
+            accent=AMBER,
+        )
+
+with col3:
     carte_kpi(
         "Plateformes sélectionnées",
         len(st.session_state.plateformes_filtre),
@@ -1436,14 +1396,15 @@ with col4:
         icone="grid",
         accent=INDIGO,
     )
-
-
 # =============================================================================
 # SECTION À RETENIR
 # =============================================================================
 
 kpi2_f = kpi2_repartition_type(df_filtre)
 kpi3_f = kpi3_repartition_plateforme(df_filtre)
+# KPI 4 — taux et détail des demandes d’accompagnement
+# Cette variable doit être calculée avant l’onglet « Accompagnement ».
+kpi4_f = kpi4_taux_accompagnement(df_filtre)
 kpi5_f = kpi5_profil_victimes(df_filtre)
 
 top_genre = extraire_top_profil(kpi5_f.get("genre"), ["genre", "Genre"])
@@ -1553,7 +1514,7 @@ with onglet1:
                 height=420,
             )
             fig1.update_traces(line_color=NAVY, marker_color=NAVY)
-            st.plotly_chart(fig1, use_container_width=True, config={'responsive': True})
+            st.plotly_chart(fig1, width="stretch", config={'responsive': True})
             if (kpi1["nombre_signalements"] == 0).any():
                 legende(
                     "⚠️ Un ou plusieurs mois de la période sélectionnée ne comportent aucun signalement dans le fichier fourni."
@@ -1567,7 +1528,7 @@ with onglet1:
                 title=titre_graphique("Répartition par type de cyberharcèlement"),
                 height=420,
             )
-            st.plotly_chart(fig2, use_container_width=True, config={'responsive': True})
+            st.plotly_chart(fig2, width="stretch", config={'responsive': True})
             type_principal = kpi2_f.iloc[0]
             legende(
                 f"Type le plus fréquent sur la période : <strong>{type_principal['cyberharcelementType']}</strong> ({type_principal['pourcentage']}%)."
@@ -1586,7 +1547,7 @@ with onglet2:
                 title=titre_graphique("Répartition par plateforme"),
                 height=420,
             )
-            st.plotly_chart(fig3, use_container_width=True, config={'responsive': True})
+            st.plotly_chart(fig3, width="stretch", config={'responsive': True})
             plateforme_principale = kpi3_f.iloc[0]
             legende(
                 f"Plateforme la plus représentée : <strong>{plateforme_principale['plateforme']}</strong> ({plateforme_principale['pourcentage']}%)."
@@ -1627,7 +1588,7 @@ with onglet3:
             fig4.update_layout(
                 margin=dict(t=80, l=20, r=20, b=20)  # on réduit le bas pour la jauge
             )
-            st.plotly_chart(fig4, use_container_width=True, config={'responsive': True})
+            st.plotly_chart(fig4, width="stretch", config={'responsive': True})
 
     with c2:
         with st.container(border=True):
@@ -1638,7 +1599,7 @@ with onglet3:
                     height=420,
                 )
                 fig4d = theme_graphique(fig4d)
-                st.plotly_chart(fig4d, use_container_width=True, config={'responsive': True})
+                st.plotly_chart(fig4d, width="stretch", config={'responsive': True})
             else:
                 st.info("Aucune demande d'accompagnement sur la période sélectionnée.")
 
@@ -1708,7 +1669,7 @@ with onglet3:
                 title=titre_graphique("Répartition des types d'accompagnement demandés"),
                 height=420,
             )
-            st.plotly_chart(theme_graphique(fig_accomp), use_container_width=True, config={'responsive': True})
+            st.plotly_chart(theme_graphique(fig_accomp), width="stretch", config={'responsive': True})
         else:
             st.info("Aucun type d'accompagnement spécifié pour les demandes.")
 
@@ -1731,7 +1692,7 @@ with onglet4:
                     title=titre_graphique("Répartition par genre"),
                     height=420,
                 )
-                st.plotly_chart(fig_genre, use_container_width=True, config={'responsive': True})
+                st.plotly_chart(fig_genre, width="stretch", config={'responsive': True})
             else:
                 st.info("Aucune donnée de genre renseignée sur la période sélectionnée.")
 
@@ -1743,7 +1704,7 @@ with onglet4:
                     title=titre_graphique("Répartition par tranche d'âge"),
                     height=420,
                 )
-                st.plotly_chart(fig_age, use_container_width=True, config={'responsive': True})
+                st.plotly_chart(fig_age, width="stretch", config={'responsive': True})
             else:
                 st.info("Aucune donnée d'âge renseignée sur la période sélectionnée.")
 
@@ -1828,7 +1789,7 @@ with onglet5:
         title=titre_graphique("Comparaison du volume de signalements"),
         height=420,
     )
-    st.plotly_chart(theme_graphique(fig_comp), use_container_width=True, config={'responsive': True})
+    st.plotly_chart(theme_graphique(fig_comp), width="stretch", config={'responsive': True})
 
     st.divider()
 
@@ -1851,7 +1812,7 @@ with onglet5:
             title=titre_graphique("Top 5 des types de cyberharcèlement"),
             height=420,
         )
-        st.plotly_chart(theme_graphique(fig_top5), use_container_width=True, config={'responsive': True})
+        st.plotly_chart(theme_graphique(fig_top5), width="stretch", config={'responsive': True})
 
     st.divider()
 
@@ -1869,7 +1830,7 @@ with onglet5:
             title=titre_graphique("Répartition des types de cyberharcèlement par plateforme"),
             height=420,
         )
-        st.plotly_chart(theme_graphique(fig_croise), use_container_width=True, config={'responsive': True})
+        st.plotly_chart(theme_graphique(fig_croise), width="stretch", config={'responsive': True})
         st.dataframe(croise, width="stretch")
 
     st.divider()
